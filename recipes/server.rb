@@ -57,6 +57,9 @@ when "debian"
   include_recipe "postgresql::server_debian"
 end
 
+#ensure postgres owns the data directory after initialization
+execute "chown -R postgres:postgres #{ node['postgresql']['config']['data_directory'] }"
+
 change_notify = node['postgresql']['server']['config_change_notify']
 
 template "#{node['postgresql']['dir']}/postgresql.conf" do
