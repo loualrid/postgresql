@@ -57,8 +57,24 @@ when "debian"
   include_recipe "postgresql::server_debian"
 end
 
-#ensure postgres owns the data directory after initialization
+#postgres user exists now, we can chown the log dir and set its file mask
+execute "chown -R postgres:postgres #{ node['postgresql']['config']['log_directory'] }"
+
+execute "chmod 1775 #{ node['postgresql']['config']['log_directory'] }"
+
+#ensure postgres owns the data directory
 execute "chown -R postgres:postgres #{ node['postgresql']['config']['data_directory'] }"
+
+#TODO identify other scripts_dir locations on all distros...
+#assume defaults on distros without this set.
+
+execute "initialize_data_directory" do
+  command "#{ node['postgresql']['scripts_dir'] }/initdb -D #{ node['postgresql']['config']['data_directory'] } && pkill postgres"
+  user    "postgres"
+
+  only_if { node['postgresql']['scripts_dir'] }
+  not_if  { ::File.exists?("#{ node['postgresql']['config']['data_directory'] }/PG_VERSION") }
+end
 
 change_notify = node['postgresql']['server']['config_change_notify']
 

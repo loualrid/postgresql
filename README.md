@@ -41,7 +41,7 @@ The following attributes are set based on the platform, see the
 * `node['postgresql']['version']` - version of postgresql to manage
 * `node['postgresql']['dir']` - home directory of where postgresql
   data and configuration lives.
-
+* `node['postgresql']['scripts_dir']` - directory where postgresql stores various scripts like initdb and pg_ctl
 * `node['postgresql']['client']['packages']` - An array of package names
   that should be installed on "client" systems.
 * `node['postgresql']['server']['packages']` - An array of package names
