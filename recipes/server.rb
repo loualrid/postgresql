@@ -94,6 +94,9 @@ template "#{node['postgresql']['dir']}/pg_hba.conf" do
   notifies change_notify, 'service[postgresql]', :immediately
 end
 
+#ensure the database has time to process the alter role below...
+sleep 15
+
 # NOTE: Consider two facts before modifying "assign-postgres-password":
 # (1) Passing the "ALTER ROLE ..." through the psql command only works
 #     if passwordless authorization was configured for local connections.
