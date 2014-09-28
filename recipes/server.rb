@@ -69,7 +69,7 @@ execute "chown -R postgres:postgres #{ node['postgresql']['config']['data_direct
 #assume defaults on distros without this set.
 
 execute "initialize_data_directory" do
-  command "#{ node['postgresql']['scripts_dir'] }/initdb -D #{ node['postgresql']['config']['data_directory'] } && pkill postgres"
+  command "#{ node['postgresql']['scripts_dir'] }/initdb -D #{ node['postgresql']['config']['data_directory'] } && service postgresql stop"
   user    "postgres"
 
   only_if { node['postgresql']['scripts_dir'] }
@@ -93,9 +93,6 @@ template "#{node['postgresql']['dir']}/pg_hba.conf" do
   mode 00600
   notifies change_notify, 'service[postgresql]', :immediately
 end
-
-#ensure the database has time to process the alter role below...
-sleep 15
 
 # NOTE: Consider two facts before modifying "assign-postgres-password":
 # (1) Passing the "ALTER ROLE ..." through the psql command only works

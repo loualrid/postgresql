@@ -32,7 +32,8 @@ when "debian"
     default['postgresql']['version'] = "9.1"
   end
 
-  default['postgresql']['dir'] = "/etc/postgresql/#{node['postgresql']['version']}/main"
+  default['postgresql']['dir']         = "/etc/postgresql/#{node['postgresql']['version']}/main"
+  default['postgresql']['scripts_dir'] = "/usr/lib/postgresql/#{ node['postgresql']['version'] }/bin"
   case
   when node['platform_version'].to_f < 6.0 # All 5.X
     default['postgresql']['server']['service_name'] = "postgresql-#{node['postgresql']['version']}"
@@ -58,6 +59,7 @@ when "ubuntu"
   end
 
   default['postgresql']['dir'] = "/etc/postgresql/#{node['postgresql']['version']}/main"
+  default['postgresql']['scripts_dir'] = "/usr/lib/postgresql/#{ node['postgresql']['version'] }/bin"
   case
   when (node['platform_version'].to_f <= 10.04) && (! node['postgresql']['enable_pgdg_apt'])
     default['postgresql']['server']['service_name'] = "postgresql-#{node['postgresql']['version']}"
@@ -101,7 +103,8 @@ when "amazon"
 when "redhat", "centos", "scientific", "oracle"
 
   default['postgresql']['version'] = "8.4"
-  default['postgresql']['dir'] = "/var/lib/pgsql/data"
+  default['postgresql']['dir']         = "/var/lib/pgsql/data"
+  default['postgresql']['scripts_dir'] = "/usr/pgsql-#{ node['postgresql']['version'] }/bin"
 
   if node['platform_version'].to_f >= 6.0 && node['postgresql']['version'] == '8.4'
     default['postgresql']['client']['packages'] = %w{postgresql-devel}
