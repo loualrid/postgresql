@@ -29,6 +29,44 @@ if(node['postgresql']['enable_pgdg_yum']) and platform_family?('rhel')
   include_recipe 'postgresql::yum_pgdg_postgresql'
 end
 
-node['postgresql']['client']['packages'].each do |pg_pack|
-  package pg_pack
+file "remove deprecated Pitti PPA apt repository" do
+  action :delete
+  path "/etc/apt/sources.list.d/pitti-postgresql-ppa"
 end
+
+bash "adding postgresql repo" do
+  user "root"
+  code <<-EOC
+  echo "deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main" > /etc/apt/sources.list.d/pgdg.list
+  wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+  EOC
+  action :run
+end
+
+execute "run apt-get update" do
+  command 'apt-get update'
+  action :run
+end
+
+packages = %w(
+  libpq-dev
+  git-core 
+  curl 
+  zlib1g-dev
+  libssl-dev 
+  libreadline-dev 
+  libyaml-dev 
+  libsqlite3-dev 
+  sqlite3 
+  libxml2-dev 
+  libxslt1-dev
+  postgresql-contrib
+)
+
+packages.each { |name| package name }
+
+package "postgresql-#{node['postgresql']['version']}"
+
+#node['postgresql']['client']['packages'].each do |pg_pack|
+#  package pg_pack
+#end
